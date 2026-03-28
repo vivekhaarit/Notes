@@ -1,0 +1,16 @@
+// Simple form — split by spaces internally (risky with spaces in paths)
+Process p = Runtime.getRuntime().exec("ls -la");
+
+// Safer form — pass command and args as an array
+Process p = Runtime.getRuntime().exec(new String[]{"python3", "script.py", "arg1"});
+
+// Read the output
+BufferedReader reader = new BufferedReader(
+    new InputStreamReader(p.getInputStream())
+);
+String line;
+while ((line = reader.readLine()) != null) {
+    System.out.println(line);
+}
+
+int exitCode = p.waitFor(); // blocks until process finishes
