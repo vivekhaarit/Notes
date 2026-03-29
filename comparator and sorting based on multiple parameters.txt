@@ -1,0 +1,17 @@
+Comparator<Map<String,Object>> sevComparator = Comparator.comparingInt(entry -> Integer.parseInt((String) entry.get(SEV)));
+		Comparator<Map<String,Object>> dateComparatorForOpenedTickets =  Comparator.<Map<String,Object>, LocalDate>comparing(entry -> LocalDate.parse((String) (entry).get(CREATIONDATE),formatter)).reversed();
+		sortOpenTickets(groupedTickets, sevComparator, dateComparatorForOpenedTickets);
+		
+		//sorting order for closed tickets
+//		Comparator<Map<String,Object>> dateComparatorForNonOpenTickets =  Comparator.<Map<String,Object>, LocalDate>comparing(entry -> LocalDate.parse((String) (entry).get(CLOSUREDATE),formatter)).reversed();
+		Comparator<Map<String,Object>> dateComparatorForNonOpenTickets = Comparator.<Map<String,Object>, LocalDate>comparing(
+			        entry -> Optional.ofNullable((String) entry.get(CLOSUREDATE))
+			                .map(d -> LocalDate.parse(d, formatter))
+			                .orElse(LocalDate.MIN)).reversed();
+		sortNonOpenTickets(groupedTickets,dateComparatorForNonOpenTickets);
+
+	public void sortOpenTickets(Map<String,List<Map<String,Object>>> groupedTickets, Comparator<Map<String,Object>> sevComparator, Comparator<Map<String,Object>> dateComparatorForOpenedTickets) {
+		List<Map<String,Object>> openTickets = groupedTickets.get("open");
+		List<Map<String,Object>> sortedOpenTickets = openTickets.stream().sorted(sevComparator.thenComparing(dateComparatorForOpenedTickets)).collect(Collectors.toList());
+		groupedTickets.put("open", sortedOpenTickets);
+	}
